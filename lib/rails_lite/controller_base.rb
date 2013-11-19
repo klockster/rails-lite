@@ -9,7 +9,7 @@ class ControllerBase
   def initialize(req, res, route_params={})
     @req = req
     @res = res
-    @params = Params.new(req, req.query_string)
+    @params = Params.new(req, route_params)
   end
 
   def session
@@ -49,5 +49,9 @@ class ControllerBase
   end
 
   def invoke_action(name)
+    self.send(name)
+    unless @already_built_response
+      render(name)
+    end
   end
 end

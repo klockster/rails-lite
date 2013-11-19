@@ -9,10 +9,15 @@ class Route
   end
 
   def matches?(req)
-    @http_method == req.request_method.downcase.to_sym && !!@pattern.match(req.body)
+    @http_method == req.request_method.downcase.to_sym && !!@pattern.match(req.path)
   end
 
   def run(req, res)
+    route_params = {}
+    rex = @pattern
+    md_obj = rex.match(req.path)
+    route_params[md_obj.names.first.to_sym] = md_obj[md_obj.names.first.to_sym]
+    @controller_class.new(req, res, route_params).invoke_action(@action_name)
   end
 end
 
@@ -24,21 +29,26 @@ class Router
   end
 
   def add_route(pattern, method, controller_class, action_name)
+    send(method, pattern, controller_class, action_name)
   end
 
   def draw(&proc)
+    instance_eval(&proc)
   end
 
   [:get, :post, :put, :delete].each do |http_method|
-    define_method(http_method) do
-
+    define_method(http_method) do |pattern, controller_class, action_name|
+      @routes << Route.new(pattern, http_method, controller_class, action_name)
     end
     # add these helpers in a loop here
   end
 
   def match(req)
+    @routes.select{ |r| r.matches?(req) }.first
   end
 
   def run(req, res)
+    match(req).run(req, res) unless match(req).nil?
+    #render 404
   end
 end

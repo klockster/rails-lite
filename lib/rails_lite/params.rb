@@ -3,8 +3,11 @@ require 'uri'
 class Params
   def initialize(req, route_params)
     @params = {}
-    @params = parse_www_encoded_form(route_params) if !!(route_params)
-    @params = parse_www_encoded_form(req.body) if !!req.body
+    #@params.merge(parse_www_encoded_form(route_params)) if !!(route_params)
+    @params.merge!(route_params)
+    @params.merge!(parse_www_encoded_form(req.query_string)) if !!req.query_string
+    @params.merge!(parse_www_encoded_form(req.body)) if !!req.body
+
   end
 
   def [](key)
@@ -26,27 +29,8 @@ class Params
       if @params[k].nil?
         @params[k] = v
       else
-        @params[k] = @params[k].merge(v)
+        @params[k] = @params[k].merge(v)#{|key,old_val,new_val| [old_val, new_val].flatten}
       end
-
-      # a = [k]
-#       until @params[k].nil?
-#         k = v.keys.first
-#         v = v[k]
-#         a << k
-#       end
-#       if a.length > 1
-#         build_str = "@params"
-#         a.each do |key|
-#           build_str << "[#{key}]"
-#         end
-#
-#         instance_variable_set(build_str, v)
-#         #@params[a.first][a[1]] = v
-#       else
-#         @params[k] = v
-#       end
-
     end
 
     @params
