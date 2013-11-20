@@ -1,12 +1,24 @@
 module UrlHelper
 
+  def link_to(title, ulr)
+    "<a href=#{url}>#{title}</a>"#.html_safe
+  end
+
+  def button_to(title, url, options = {method: :post})
+    a = <<-HTML
+    <form action=#{url} method="POST">
+      <input type="hidden" name="_method" value="#{options[method]}">
+      <input type="hidden" name="authenticity_token" value="form_authenticity_token">
+      <input type="submit" value="#{title}">
+    </form>
+    HTML
+
+    a#.html_safe
+  end
+
   def method_missing(method_name, *args)
     raise NoMethodError unless (/_url$/).match(method_name)
     body = method_name.to_s.split("_url").join("")
-    #post_url => posts/:id
-    #posts_url => posts/
-    #new_post_url => posts/new
-    #edit_post_url => posts/:id/edit
     keys = body.split("_")
 
     build_url(keys, args.to_a)
