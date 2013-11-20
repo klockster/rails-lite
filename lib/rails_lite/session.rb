@@ -23,3 +23,14 @@ class Session
     res.cookies << WEBrick::Cookie.new('_rails_lite_app', @cookie.to_json)
   end
 end
+
+class Flash < Session
+  def initialize(req)
+    @cookie = {}
+  end
+
+  def store_session(res)
+    res.cookies << WEBrick::Cookie.new('_rails_lite_flash', @cookie.to_json)
+  end
+
+end

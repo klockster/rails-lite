@@ -16,7 +16,16 @@ class ControllerBase
     @session ||= Session.new(@req)
   end
 
+  def flash
+    @flash ||= Flash.new(@req)
+  end
+
+  # def flash[]=(key,value)
+#     @flash ||= Flash.new(@req)
+#   end
+
   def already_rendered?
+    !!@already_built_response
   end
 
   def redirect_to(url)
@@ -25,6 +34,7 @@ class ControllerBase
     @res.set_redirect(WEBrick::HTTPStatus::TemporaryRedirect,url)
     @already_built_response = true
     session.store_session(@res)
+    flash.store_session(@res)
   end
 
   def render_content(content, type)
@@ -32,16 +42,18 @@ class ControllerBase
     @res.body = content
     @already_built_response = true
     session.store_session(@res)
+    flash.store_session(@res)
   end
 
   def render(template_name)
     controller_name = self.class.to_s.underscore
     file_name = "views/#{controller_name}/#{template_name}.html.erb"
+    instance_vars = self.instance_variables
+    form_authenticity_token = SecureRandom.urlsafe_base64(16)
+    binding
     file = File.open(file_name, "r")
     template = ERB.new(file.read)
     file.close
-    instance_vars = self.instance_variables
-    binding
     content = template.result(binding)
     type = "text/html"
 
