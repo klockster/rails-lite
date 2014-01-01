@@ -1,7 +1,6 @@
 #Rails-lite
 
 #####Check out code in lib/rails_lite 
-
 ##Features:
 * WEBrick server use to get request and response, and allow cookies, redirect, and rendering
 * Flash and Session cookie setting
