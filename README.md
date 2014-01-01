@@ -1,6 +1,8 @@
 #Rails-lite
 
 #####Check out code in lib/rails_lite 
+##Description:
+This is a metaprogramming challenge to replicate Rails Controller and Routing features
 ##Features:
 * WEBrick server use to get request and response, and allow cookies, redirect, and rendering
 * Flash and Session cookie setting
